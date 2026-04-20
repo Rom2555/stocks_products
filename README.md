@@ -6,7 +6,19 @@
 
 - **Django 3.2** — веб-фреймворк
 - **Django REST Framework** — REST API
-- **PostgreSQL** — база данных
+- **PostgreSQL 13** — база данных
+- **Gunicorn** — WSGI сервер
+- **Nginx** — обратный прокси
+- **Docker & Docker Compose** — контейнеризация
+
+## Архитектура:
+```
+┌─────────┐     ┌──────────┐     ┌────────────┐     ┌────────────┐
+│  Nginx  │────▶│ Gunicorn │────▶│  Django    │────▶│ PostgreSQL │
+└─────────┘     └──────────┘     └────────────┘     └────────────┘
+      │
+      └───────────────────────────────────▶ Статические файлы
+```
 
 ## Структура проекта
 
@@ -14,6 +26,10 @@
 stocks_products/
 ├── manage.py
 ├── requirements.txt
+├── Dockerfile
+├── docker-compose.yml
+├── nginx.conf
+├── .dockerignore
 ├── stocks_products/        # Основной конфигурационный модуль
 │   ├── settings.py         # Настройки Django
 │   ├── urls.py             # Корневые URL
@@ -76,7 +92,36 @@ stocks_products/
 - `DELETE /api/v1/stocks/{id}/` — удалить склад
 - `GET /api/v1/stocks/?products=...` — поиск складов по товару
 
-## Установка и запуск
+## 🚀 Запуск через Docker Compose
+
+✅ **Рекомендуемый способ**
+
+1. Убедитесь что у вас установлен Docker и Docker Compose
+
+2. Запустите все сервисы одной командой:
+```bash
+docker-compose up --build
+```
+
+3. Приложение будет доступно по адресу:
+✅ **http://localhost**
+
+✅ Автоматически при запуске выполняются:
+- Применение всех миграций базы данных
+- Сбор статических файлов для админки и DRF
+- Запуск PostgreSQL, Gunicorn и Nginx
+
+Для остановки:
+```bash
+docker-compose down
+```
+
+Для остановки с удалением томов данных:
+```bash
+docker-compose down -v
+```
+
+## 💻 Локальная разработка
 
 1. Установить зависимости:
 ```bash
@@ -90,7 +135,7 @@ pip install -r requirements.txt
 python manage.py migrate
 ```
 
-4. Запустить сервер:
+4. Запустить сервер разработки:
 ```bash
 python manage.py runserver
 ```
@@ -131,6 +176,11 @@ Content-Type: application/json
 
 ## Требования
 
+Для запуска через Docker:
+- Docker 20.10+
+- Docker Compose 1.29+
+
+Для локальной разработки:
 - Python 3.8+
 - PostgreSQL 12+
 - Django 3.2
