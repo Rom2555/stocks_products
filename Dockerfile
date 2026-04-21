@@ -15,5 +15,5 @@ COPY . .
 # Открываем порт 8000
 EXPOSE 8000
 
-# Запускаем приложение
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Запускаем приложение через WSGI сервер Gunicorn
+CMD ["gunicorn", "stocks_products.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3"]
